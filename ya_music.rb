@@ -65,8 +65,24 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                     return "@NoAlbum!"
                 end
             end
-        #####################################################################################################################################
-        when artist_id_arg == nil && album_id_arg && song_id_arg ### Запрашивается трек #####################################################
+        #############################################################################################################################################
+        when artist_id_arg == nil && album_id_arg && song_id_arg || artist_id_arg == nil && album_id_arg == nil && song_id_arg ### Запрашивается трек
+            if album_id_arg == nil ### Получена короткая ссылка на трек
+                url = URI.parse("https://music.yandex.ru/track/#{song_id_arg}")
+                puts url
+                begin ### Отлавливаем ошибки
+                    html = URI::open(url)
+                    rescue OpenURI::HTTPError => error
+                    puts error
+                end
+                if error
+                    return "@WrongUrl!"
+                else
+                    doc = Nokogiri::HTML(html)
+                    artist_div = doc.css("div.page-album__title")
+                    album_id_arg = artist_div.to_s[/(?<=<a href="\/album\/).*(?=" class)/] ### Получаем недостающий ID альбома
+                end
+            end        
             url = URI.parse("https://music.yandex.ru/album/#{album_id_arg}/track/#{song_id_arg}") ### Парсим страницу (ищем название трека) #
             begin ### Отлавливаем ошибки
                 html = URI::open(url)

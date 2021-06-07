@@ -8,10 +8,6 @@ require_relative 'spotify.rb'
 config = YAML.load_file("config.yaml")
 tg_token = config["telegram"]["tg_token"]
 #######################################################################################################################
-#url = "https://music.yandex.ru/track/39078174"
-#puts ya_music_get_name(nil, nil, "39078174")
-#exit
-
 Telegram::Bot::Client.run(tg_token) do |bot|
     bot.listen do |message|
         case message.to_s
@@ -67,8 +63,8 @@ Telegram::Bot::Client.run(tg_token) do |bot|
                 else
                     bot.api.send_message(chat_id: message.chat.id, text: "#{ya_music_url}")
                 end
-            ################################################################################################################################################################
-            when message.text =~ /.*https:\/\/music.yandex.ru\/album\/.*\/track\/.*/ || /.*https:\/\/music.yandex.ru\/track\/.*/ ### Получили ссылку на трек в Яндекс.Музыке
+            ############################################################################################################
+            when /.*https:\/\/music.yandex.ru\/album\/.*\/track\/.*/ ### Получили ссылку на трек в Яндекс.Музыке #######
                 puts "Получили ссылку на трек в Яндекс.Музыке"
                 album_id = message.text[/(?<=\/album\/)\d*/]
                 track_id = message.text[/(?<=\/track\/)\S*/]

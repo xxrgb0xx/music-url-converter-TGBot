@@ -1,0 +1,9 @@
+telegram:
+  tg_token: ""
+spotify:
+  spotify_uid: ""
+  spotify_token: ""
+yandex:
+  https_proxy: "no"
+  https_proxy_addr: ""
+  https_proxy_port: ""

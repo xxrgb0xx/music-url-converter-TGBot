@@ -209,11 +209,12 @@ def ya_music_get_id (artist_arg, album_arg, song_arg)
                     tracks_div = doc.css("div.d-track__name")
                     tracks = []
                     tracks_div.each do |current_track|
-                            tracks << current_track.to_s[/(?<=deco-link_stronger">).*(?=<\/a>)/].upcase
+                            ### tracks << current_track.to_s[/(?<=deco-link_stronger">).*(?=<\/a>)/].upcase ### Яндекс обрамили пробелами название трека
+                            tracks << current_track.to_s[/(?<=deco-link_stronger"> ).*(?= <\/a>)/].upcase
                     end
                     track_number = tracks.index(song_arg.upcase)
                     if track_number
-                        track_id = tracks_div[track_number].to_s[/(?<=href="\/album\/#{album_id}\/track\/).*(?=" class="d-track__title)/] ###ТУТ КОСЯК
+                        track_id = tracks_div[track_number].to_s[/(?<=href="\/album\/#{album_id}\/track\/).*(?=" class="d-track__title)/]
                         url = "https://music.yandex.ru/album/#{album_id}/track/#{track_id}"
                         return url
                     else

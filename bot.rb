@@ -19,7 +19,7 @@ Telegram::Bot::Client.run(tg_token) do |bot|
                 bot.api.send_message(chat_id: message.chat.id, text: "Пока, #{message.from.first_name}!")
             ###########################################################################################################
             when /[Хх][Уу][ИиЙй|ЕеЁё|Яя]/
-                puts "Попало под хуевый кейс"
+                puts "Попало под ху*вый кейс"
                 bot.api.send_message(chat_id: message.chat.id, text: "Ты чё, пёс?!")
             ############################################################################################################
             when /.*https:\/\/open.spotify.com\/artist\/.*/ ### Получили ссылку на исполнителя в Spotify ###############

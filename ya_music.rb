@@ -45,7 +45,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
             end
             if error
                 return '@WrongUrl!'
-                doc = Nokogiri::HTML(html)
+            else doc = Nokogiri::HTML(html)
                 artist_div = doc.css("div.d-album-summary__content")
                 album_div = doc.css("div.page-album__title")
                 if artist_div.size != 0 && album_div.size !=0

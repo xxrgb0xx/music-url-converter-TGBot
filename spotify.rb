@@ -21,7 +21,7 @@ def spotify_get_name(artist_id_arg, album_id_arg, song_id_arg)
             if artist
                 return artist
             else
-                return "@NoArtist!"
+                return '@NoArtist!'
             end 
         #####################################################################################################
         when artist_id_arg == nil && album_id_arg && song_id_arg == nil ### Запрашивается альбом ############
@@ -36,7 +36,7 @@ def spotify_get_name(artist_id_arg, album_id_arg, song_id_arg)
                 artist_name = album_raw.artists[0].name
                 return artist_name, album_name     
             else
-                return "@NoAlbum!"
+                return '@NoAlbum!'
             end   
         #####################################################################################################
         when artist_id_arg == nil && album_id_arg == nil && song_id_arg ### Запрашивается трек ##############
@@ -52,7 +52,7 @@ def spotify_get_name(artist_id_arg, album_id_arg, song_id_arg)
                 track_name = track_raw.name
                 return artist_name, album_name, track_name
             else
-                return "@NoTrack!"
+                return '@NoTrack!'
             end
     end
 end
@@ -71,7 +71,7 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
                 url = "https://open.spotify.com/artist/#{artist_id}"
                 return url
             else
-                return "@NoArtist!"
+                return '@NoArtist!'
             end
         ############################################################################################            
         when artist_arg && album_arg && song_arg == nil ### Запрашивается альбом ###################
@@ -109,10 +109,10 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
                     url = "https://open.spotify.com/album/#{album_id}"
                     return url        
                 else
-                    return "@NoAlbum!"
+                    return '@NoAlbum!'
                 end
             else
-                return "@NoArtist!"
+                return '@NoArtist!'
             end  
         ############################################################################################            
         when artist_arg && album_arg && song_arg ### Запрашивается трек ############################
@@ -169,13 +169,13 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
                         url = "https://open.spotify.com/track/#{track_id}"
                         return url
                     else
-                        return "@NoTrack!"
+                        return '@NoTrack!'
                     end
                 else                     
-                    return "@NoAlbum!"
+                    return '@NoAlbum!'
                 end
             else
-                return "@NoArtist!"
+                return '@NoArtist!'
             end
     end    
 end

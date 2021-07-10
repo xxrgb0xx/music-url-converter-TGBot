@@ -23,7 +23,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                 puts error
             end
             if error
-                return "@WrongUrl!"
+                return '@WrongUrl!'
             else    
                 doc = Nokogiri::HTML(html)
                 artist_div = doc.css("div.d-generic-page-head__main-top")
@@ -31,7 +31,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                     artist_name = artist_div.to_s[/(?<=class="page-artist__title typo-h1 typo-h1_big">).*(?=\<\/h1>)/]
                     return artist_name
                 else
-                    return "@NoArtist!"
+                    return '@NoArtist!'
                 end
             end
         #####################################################################################################################################
@@ -44,8 +44,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                 puts error
             end
             if error
-                return "@WrongUrl!"
-            else
+                return '@WrongUrl!'
                 doc = Nokogiri::HTML(html)
                 artist_div = doc.css("div.d-album-summary__content")
                 album_div = doc.css("div.page-album__title")
@@ -64,7 +63,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                         return artist_name, album_name
                     end
                 else
-                    return "@NoAlbum!"
+                    return '@NoAlbum!'
                 end
             end
         #############################################################################################################################################
@@ -78,7 +77,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                     puts error
                 end
                 if error
-                    return "@WrongUrl!"
+                    return '@WrongUrl!'
                 else
                     doc = Nokogiri::HTML(html)
                     artist_div = doc.css("div.page-album__title")
@@ -93,7 +92,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                 puts error
             end
             if error
-                return "@WrongUrl!"
+                return '@WrongUrl!'
             else
                 doc = Nokogiri::HTML(html)
                 artist_div = doc.css("div.d-album-summary__content")
@@ -129,7 +128,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                         end
                     end        
                 else
-                    return "@NoTrack!"
+                    return '@NoTrack!'
                 end
             end        
     end
@@ -155,7 +154,7 @@ def ya_music_get_id (artist_arg, album_arg, song_arg)
                 url = "https://music.yandex.ru/artist/#{artist_id}"
                 return url
             else
-                return "@NoArtist!"
+                return '@NoArtist!'
             end
         ###############################################################################################
         when artist_arg && album_arg && song_arg == nil ### Запрашивается альбом ######################
@@ -193,10 +192,10 @@ def ya_music_get_id (artist_arg, album_arg, song_arg)
                     url = "https://music.yandex.ru/album/#{album_id}"
                     return url
                 else
-                    return "@NoAlbum!"
+                    return '@NoAlbum!'
                 end  
             else
-                return "@NoArtist!"   
+                return '@NoArtist!'
             end    
         ###############################################################################################
         when  artist_arg && album_arg && song_arg ### Запрашивается трек ##############################
@@ -251,10 +250,10 @@ def ya_music_get_id (artist_arg, album_arg, song_arg)
                         url = "https://music.yandex.ru/album/#{album_id}/track/#{track_id}"
                         return url
                     else
-                        return "@NoTrack!"
+                        return '@NoTrack!'
                     end
                 else
-                    return "@NoAlbum!"
+                    return '@NoAlbum!'
                 end         
             else
                 return '@NoArtist!'

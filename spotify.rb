@@ -61,13 +61,19 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
     case
         ############################################################################################        
         when artist_arg && album_arg == nil && song_arg == nil ### Запрашивается исполнитель #######
-            begin ### Отлавливаем ошибку.
-                artist_raw = RSpotify::Artist.search(artist_arg)[0]
+            begin ### Отлавливаем ошибку.              
+                artists_raw = RSpotify::Artist.search(artist_arg)
+                artists_names = []
+                artists_raw.each do |current_artist|
+                    artists_names << current_artist.name.upcase
+                end
+                artist_number = artists_names.index(artist_arg.upcase)
+                artist_raw = artists_raw[artist_number]
                 rescue RestClient::BadRequest => error
                 rescue RestClient::NotFound => error
             end
             if artist_raw
-                artist_id = RSpotify::Artist.search(artist_arg)[0].id
+                artist_id = artist_raw.id
                 url = "https://open.spotify.com/artist/#{artist_id}"
                 return url
             else
@@ -76,7 +82,13 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
         ############################################################################################            
         when artist_arg && album_arg && song_arg == nil ### Запрашивается альбом ###################
             begin ### Ищем запрашиваемого исполнителя
-                artist_raw = RSpotify::Artist.search(artist_arg)[0]
+                artists_raw = RSpotify::Artist.search(artist_arg)
+                artists_names = []
+                artists_raw.each do |current_artist|
+                    artists_names << current_artist.name.upcase
+                end
+                artist_number = artists_names.index(artist_arg.upcase)
+                artist_raw = artists_raw[artist_number]
                 rescue RestClient::BadRequest => error
                 rescue RestClient::NotFound => error
             end
@@ -117,7 +129,13 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
         ############################################################################################            
         when artist_arg && album_arg && song_arg ### Запрашивается трек ############################
             begin ### Ищем запрашиваемого исполнителя
-                artist_raw = RSpotify::Artist.search(artist_arg)[0]
+                artists_raw = RSpotify::Artist.search(artist_arg)
+                artists_names = []
+                artists_raw.each do |current_artist|
+                    artists_names << current_artist.name.upcase
+                end
+                artist_number = artists_names.index(artist_arg.upcase)
+                artist_raw = artists_raw[artist_number]
                 rescue RestClient::BadRequest => error
                 rescue RestClient::NotFound => error
             end

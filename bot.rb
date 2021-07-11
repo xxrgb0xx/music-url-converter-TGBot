@@ -10,7 +10,8 @@ tg_token = config["telegram"]["tg_token"]
 #######################################################################################################################
 Telegram::Bot::Client.run(tg_token) do |bot|
     bot.listen do |message|
-        case message.to_s
+        #case message.to_s
+        case message.text   
             ###########################################################################################################
             when '/start'
                 bot.api.send_message(chat_id: message.chat.id, text: "Вечер в хату, #{message.from.first_name}!")
@@ -64,8 +65,10 @@ Telegram::Bot::Client.run(tg_token) do |bot|
                     bot.api.send_message(chat_id: message.chat.id, text: "#{ya_music_url}")
                 end
             ################################################################################################################################################################
-            when message.text =~ /.*https:\/\/music.yandex.ru\/album\/.*\/track\/.*/ || /.*https:\/\/music.yandex.ru\/track\/.*/ ### Получили ссылку на трек в Яндекс.Музыке    
+            #when message.text =~ /.*https:\/\/music.yandex.ru\/album\/.*\/track\/.*/ || /.*https:\/\/music.yandex.ru\/track\/.*/ ### Получили ссылку на трек в Яндекс.Музыке
+            when /(.*https:\/\/music.yandex.ru\/album\/.*\/track\/.*)|(.*https:\/\/music.yandex.ru\/track\/.*)/
                 puts "Получили ссылку на трек в Яндекс.Музыке"
+                #exit
                 album_id = message.text[/(?<=\/album\/)\d*/]
                 track_id = message.text[/(?<=\/track\/)\S*/]
                 arg = ya_music_get_name(nil, album_id, track_id)

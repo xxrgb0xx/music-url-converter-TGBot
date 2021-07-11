@@ -27,9 +27,12 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
             else    
                 doc = Nokogiri::HTML(html)
                 artist_div = doc.css("div.d-generic-page-head__main-top")
-                if artist_div.size != 0
+                if artist_div != nil
                     artist_name = artist_div.to_s[/(?<=class="page-artist__title typo-h1 typo-h1_big">).*(?=\<\/h1>)/]
-                    return artist_name
+                    if artist_name == nil
+                        artist_name = artist_div.to_s[/(?<=class="page-artist__title typo-h1 typo-h1_small">).*(?=\<\/h1>)/]
+                    end
+                    return artist_name.gsub('&amp;','&')
                 else
                     return '@NoArtist!'
                 end
@@ -47,6 +50,17 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                 return '@WrongUrl!'
             else doc = Nokogiri::HTML(html)
                 artist_div = doc.css("div.d-album-summary__content")
+                if artist_div != nil
+                    
+                    puts artist_div = artist_div.to_s.gsub('&amp;','&')
+                    puts
+                    puts artist_div.to_s[/(?<=title=").*(?=">)/] #######!1111111111
+                
+
+                    artist_name = artist_div.to_s[/(?<=class="page-artist__title typo-h1 typo-h1_big">).*(?=\<\/h1>)/]
+                    if artist_name == nil
+                        artist_name = artist_div.to_s[/(?<=class="page-artist__title typo-h1 typo-h1_small">).*(?=\<\/h1>)/]
+                    end
                 album_div = doc.css("div.page-album__title")
                 if artist_div.size != 0 && album_div.size !=0
                     artist_name = artist_div.to_s[/(?<=title=").*(?=">)/]
@@ -66,6 +80,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                     return '@NoAlbum!'
                 end
             end
+        end
         #############################################################################################################################################
         when artist_id_arg == nil && album_id_arg && song_id_arg || artist_id_arg == nil && album_id_arg == nil && song_id_arg ### Запрашивается трек
             if album_id_arg == nil ### Получена короткая ссылка на трек
@@ -100,7 +115,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                 track_div = doc.css("div.sidebar__title")
                 if artist_div.size != 0 && album_div.size != 0 && track_div.size != 0
                     artist_name = artist_div.to_s[/(?<=title=").*(?=">)/]
-                    album_name = album_div.to_s[/(?<=deco-link">).*(?=<\/a>)/]
+                    album_name = album_div.to_s[/(?<=deco-link">).*(?=<\/a>)/].gsub('&amp;','&')
                     album_version = album_div.to_s[/(?<=album__version link">).*(?=<\/span>)/]
                     album_version2 = album_div.to_s[/(?<=album__version">).*(?=<\/span>)/]
                     track_name = track_div.to_s[/(?<=class="d-link deco-link">).*(?=\<\/a>)/]

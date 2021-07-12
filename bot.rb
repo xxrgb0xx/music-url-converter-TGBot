@@ -42,27 +42,35 @@ Telegram::Bot::Client.run(tg_token) do |bot|
                     puts "Получили ссылку на альбом в Spotify"
                     album_id = message.text[/(?<=https:\/\/open.spotify.com\/album\/)\S*/]
                     arg = spotify_get_name(nil, album_id, nil)
-                    artist_name = arg[0]
-                    album_name = arg [1]
-                    ya_music_url = ya_music_get_id(artist_name, album_name, nil)
-                    if ya_music_url == '@NoAlbum!'
-                        bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Яндекс.Музыке нет альбома ALBUM##{album_name}")
+                    if arg == '@NoAlbum!'
+                        bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Spotify нет альбома ID##{album_id}")
                     else
-                        bot.api.send_message(chat_id: message.chat.id, text: "#{ya_music_url}")
+                        artist_name = arg[0]
+                        album_name = arg [1]
+                        ya_music_url = ya_music_get_id(artist_name, album_name, nil)
+                        if ya_music_url == '@NoAlbum!'
+                            bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Яндекс.Музыке нет альбома ALBUM##{album_name}")
+                        else
+                            bot.api.send_message(chat_id: message.chat.id, text: "#{ya_music_url}")
+                        end
                     end
                 ############################################################################################################
                 when /.*https:\/\/open.spotify.com\/track\/.*/ ### Получили ссылку на трек в Spotify #######################
                     puts "Получили ссылку на трек в Spotify"
                     track_id = message.text[/(?<=https:\/\/open.spotify.com\/track\/)\S*/]
                     arg = spotify_get_name(nil, nil, track_id)
-                    artist_name = arg[0]
-                    album_name = arg[1]
-                    track_name = arg[2]
-                    ya_music_url = ya_music_get_id(artist_name, album_name, track_name)
-                    if ya_music_url == '@NoTrack!'
-                        bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Яндекс.Музыке нет трека TRACK##{track_name}")
+                    if arg == '@NoTrack!'
+                        bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Spotify нет трека ID##{track_id}")
                     else
-                        bot.api.send_message(chat_id: message.chat.id, text: "#{ya_music_url}")
+                        artist_name = arg[0]
+                        album_name = arg[1]
+                        track_name = arg[2]
+                        ya_music_url = ya_music_get_id(artist_name, album_name, track_name)
+                        if ya_music_url == '@NoTrack!'
+                            bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Яндекс.Музыке нет трека TRACK##{track_name}")
+                        else
+                            bot.api.send_message(chat_id: message.chat.id, text: "#{ya_music_url}")
+                        end
                     end
                 ################################################################################################################################################################
                 #when message.text =~ /.*https:\/\/music.yandex.ru\/album\/.*\/track\/.*/ || /.*https:\/\/music.yandex.ru\/track\/.*/ ### Получили ссылку на трек в Яндекс.Музыке
@@ -123,8 +131,8 @@ Telegram::Bot::Client.run(tg_token) do |bot|
                         end
                     end    
             end
-        #rescue => error
-        #puts "ERROR:bot.rb:#{error}"
+        rescue => error
+        puts "ERROR:bot.rb:#{error}"
         end    
     end
 end

@@ -50,38 +50,30 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                 return '@WrongUrl!'
             else doc = Nokogiri::HTML(html)
                 artist_div = doc.css("div.d-album-summary__content")
-                if artist_div != nil
-                    
-                    puts artist_div = artist_div.to_s.gsub('&amp;','&')
-                    puts
-                    puts artist_div.to_s[/(?<=title=").*(?=">)/] #######!1111111111
-                
-
-                    artist_name = artist_div.to_s[/(?<=class="page-artist__title typo-h1 typo-h1_big">).*(?=\<\/h1>)/]
-                    if artist_name == nil
-                        artist_name = artist_div.to_s[/(?<=class="page-artist__title typo-h1 typo-h1_small">).*(?=\<\/h1>)/]
-                    end
-                album_div = doc.css("div.page-album__title")
-                if artist_div.size != 0 && album_div.size !=0
-                    artist_name = artist_div.to_s[/(?<=title=").*(?=">)/]
-                    album_name = album_div.to_s[/(?<=class="deco-typo">).*(?=<\/h1>)/]
-                    album_version = album_div.to_s[/(?<=album__version">).*(?=<\/span>)/]
-                    album_version2 = album_div.to_s[/(?<=album__version link">).*(?=<\/span>)/]
-                    if album_version == nil && album_version2 == nil
-                        return artist_name, album_name
-                    elsif album_version != nil
-                        album_name = "#{album_name} (#{album_version})"
-                        return artist_name, album_name
-                    elsif album_version2 != nil
-                        album_name = "#{album_name} (#{album_version2})"
-                        return artist_name, album_name
+                if artist_div.size != 0
+                    album_div = doc.css("div.page-album__title")
+                    if album_div.size !=0
+                        artist_name = artist_div.to_s[/(?<=title=").*?(?=">)/]
+                        album_name = album_div.to_s[/(?<=class="deco-typo">).*(?=<\/h1>)/]
+                        album_version = album_div.to_s[/(?<=album__version">).*(?=<\/span>)/]
+                        album_version2 = album_div.to_s[/(?<=album__version link">).*(?=<\/span>)/]
+                        if album_version == nil && album_version2 == nil
+                            return artist_name.gsub('&amp;','&'), album_name.gsub('&amp;','&')
+                        elsif album_version != nil ### Если у альбома составное название
+                            album_name = "#{album_name} (#{album_version})"
+                            return artist_name.gsub('&amp;','&'), album_name.gsub('&amp;','&')
+                        elsif album_version2 != nil ### Если у альбома составное название2
+                            album_name = "#{album_name} (#{album_version2})"
+                            return artist_name.gsub('&amp;','&'), album_name.gsub('&amp;','&')
+                        end
+                    else
+                        return '@NoAlbum!'
                     end
                 else
-                    return '@NoAlbum!'
+                    return '@NoArtist!'
                 end
             end
-        end
-        #############################################################################################################################################
+        #!!!!!!!!!!!!!############################################################################################################################################
         when artist_id_arg == nil && album_id_arg && song_id_arg || artist_id_arg == nil && album_id_arg == nil && song_id_arg ### Запрашивается трек
             if album_id_arg == nil ### Получена короткая ссылка на трек
                 url = URI.parse("https://music.yandex.ru/track/#{song_id_arg}")
@@ -126,7 +118,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                         elsif album_version != nil ### Если у альбома составное название
                             album_name = "#{album_name} (#{album_version})"
                             return artist_name, album_name, track_name
-                        elsif album_version2 != nil
+                        elsif album_version2 != nil ### Если у альбома составное название2
                             album_name = "#{album_name} (#{album_version2})"
                             return artist_name, album_name, track_name
                         end
@@ -198,7 +190,7 @@ def ya_music_get_id (artist_arg, album_arg, song_arg)
                 albums_div = doc.css("div.album__title")
                 albums = []
                 albums_div.each do |current_album|
-                albums << current_album.attr('title').upcase
+                    albums << current_album.attr('title').upcase
                 end
                 album_number = albums.index(album_arg.upcase) ### Получаем порядковый номер искомого альбома
                 if album_number

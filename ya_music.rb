@@ -73,7 +73,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                     return '@NoArtist!'
                 end
             end
-        #!!!!!!!!!!!!!############################################################################################################################################
+        #############################################################################################################################################
         when artist_id_arg == nil && album_id_arg && song_id_arg || artist_id_arg == nil && album_id_arg == nil && song_id_arg ### Запрашивается трек
             if album_id_arg == nil ### Получена короткая ссылка на трек
                 url = URI.parse("https://music.yandex.ru/track/#{song_id_arg}")
@@ -91,7 +91,7 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                     album_id_arg = artist_div.to_s[/(?<=<a href="\/album\/).*(?=" class)/] ### Получаем недостающий ID альбома
                 end
             end        
-            url = URI.parse("https://music.yandex.ru/album/#{album_id_arg}/track/#{song_id_arg}") ### Парсим страницу (ищем название трека) #
+            url = URI.parse("https://music.yandex.ru/album/#{album_id_arg}/track/#{song_id_arg}") ### Парсим страницу (ищем название трека)
             begin ### Отлавливаем ошибки
                 html = URI::open(url)
                 rescue OpenURI::HTTPError => error
@@ -106,8 +106,8 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                 album_div = doc.css("div.page-album__title")
                 track_div = doc.css("div.sidebar__title")
                 if artist_div.size != 0 && album_div.size != 0 && track_div.size != 0
-                    artist_name = artist_div.to_s[/(?<=title=").*(?=">)/]
-                    album_name = album_div.to_s[/(?<=deco-link">).*(?=<\/a>)/].gsub('&amp;','&')
+                    artist_name = artist_div.to_s[/(?<=title=").*?(?=">)/]
+                    album_name = album_div.to_s[/(?<=deco-link">).*(?=<\/a>)/]
                     album_version = album_div.to_s[/(?<=album__version link">).*(?=<\/span>)/]
                     album_version2 = album_div.to_s[/(?<=album__version">).*(?=<\/span>)/]
                     track_name = track_div.to_s[/(?<=class="d-link deco-link">).*(?=\<\/a>)/]
@@ -125,13 +125,13 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                     else ### Если у трека составное название
                         track_name = "#{track_name} - #{track_name_secondary}"   
                         if album_version == nil && album_version2 == nil ### Если у альбома простое название
-                            return artist_name, album_name, track_name
+                            return artist_name.gsub('&amp;','&'), album_name.gsub('&amp;','&'), track_name.gsub('&amp;','&')
                         elsif album_version != nil ### Если у альбома составное название
                             album_name = "#{album_name} (#{album_version})"
-                            return artist_name, album_name, track_name
+                            return artist_name.gsub('&amp;','&'), album_name.gsub('&amp;','&'), track_name.gsub('&amp;','&')
                         elsif album_version2 != nil
                             album_name = "#{album_name} (#{album_version2})"
-                            return artist_name, album_name, track_name
+                            return artist_name.gsub('&amp;','&'), album_name.gsub('&amp;','&'), track_name.gsub('&amp;','&')
                         end
                     end        
                 else

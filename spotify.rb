@@ -124,7 +124,7 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
                 rescue RestClient::NotFound => error
                 puts error    
             end    
-        #!!!!!!!!1###########################################################################################            
+        ############################################################################################            
         when artist_arg && album_arg && song_arg ### Запрашивается трек ############################
             begin ### Ищем запрашиваемого исполнителя
                 artists_raw = RSpotify::Artist.search(artist_arg)

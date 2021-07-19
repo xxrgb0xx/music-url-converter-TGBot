@@ -73,8 +73,7 @@ Telegram::Bot::Client.run(tg_token) do |bot|
                         end
                     end
                 ################################################################################################################################################################
-                #when message.text =~ /.*https:\/\/music.yandex.ru\/album\/.*\/track\/.*/ || /.*https:\/\/music.yandex.ru\/track\/.*/ ### Получили ссылку на трек в Яндекс.Музыке
-                when /(.*https:\/\/music.yandex.ru\/album\/.*\/track\/.*)|(.*https:\/\/music.yandex.ru\/track\/.*)/
+                when /(.*https:\/\/music.yandex.ru\/album\/.*\/track\/.*)|(.*https:\/\/music.yandex.ru\/track\/.*)/ ### Получили ссылку на трек в Яндекс.Музыке ################
                     puts "Получили ссылку на трек в Яндекс.Музыке"
                     album_id = message.text[/(?<=\/album\/)\d*/]
                     track_id = message.text[/(?<=\/track\/)\S*/]

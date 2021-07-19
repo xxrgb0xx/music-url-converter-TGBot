@@ -114,13 +114,13 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                     track_name_secondary = track_div.to_s[/(?<=class="deco-typo-secondary">\s).*(?=<\/span>)/]
                     if track_name_secondary == nil ### Если у трека простое название
                         if album_version == nil && album_version2 == nil ### Если у альбома простое название
-                            return artist_name, album_name, track_name
+                            return artist_name.gsub('&amp;','&'), album_name.gsub('&amp;','&'), track_name.gsub('&amp;','&')
                         elsif album_version != nil ### Если у альбома составное название
                             album_name = "#{album_name} (#{album_version})"
-                            return artist_name, album_name, track_name
+                            return artist_name.gsub('&amp;','&'), album_name.gsub('&amp;','&'), track_name.gsub('&amp;','&')
                         elsif album_version2 != nil ### Если у альбома составное название2
                             album_name = "#{album_name} (#{album_version2})"
-                            return artist_name, album_name, track_name
+                            return artist_name.gsub('&amp;','&'), album_name.gsub('&amp;','&'), track_name.gsub('&amp;','&')
                         end
                     else ### Если у трека составное название
                         track_name = "#{track_name} - #{track_name_secondary}"   

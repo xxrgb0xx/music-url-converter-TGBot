@@ -8,9 +8,14 @@ require_relative 'spotify.rb'
 config = YAML.load_file("config.yaml")
 tg_token = config["telegram"]["tg_token"]
 #######################################################################################################################
+$stdout.reopen("log/stdout.log", "a")
+$stderr.reopen("log/stderr.log", "a")
+$stdout.sync, $stderr.sync = true
+#######################################################################################################################
+
 Telegram::Bot::Client.run(tg_token) do |bot|
     bot.listen do |message|
-        begin ### Отлавшиваем ошибки при работе 'telegram/bot'
+        begin ### Отлавливаем ошибки при работе 'telegram/bot'
             case message.text   
                 ###########################################################################################################
                 when '/start'

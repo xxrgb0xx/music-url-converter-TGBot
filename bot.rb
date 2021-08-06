@@ -14,8 +14,8 @@ $stdout.sync, $stderr.sync = true
 #######################################################################################################################
 
 Telegram::Bot::Client.run(tg_token) do |bot|
-    bot.listen do |message|
-        begin ### Отлавливаем ошибки при работе 'telegram/bot'
+    begin ### Отлавливаем ошибки при работе 'telegram/bot'
+        bot.listen do |message|
             case message.text   
                 ###########################################################################################################
                 when '/start'
@@ -134,9 +134,9 @@ Telegram::Bot::Client.run(tg_token) do |bot|
                             bot.api.send_message(chat_id: message.chat.id, text: "#{spotify_url}")
                         end
                     end    
-            end
-        rescue => error
-        puts "ERROR:bot.rb:#{error}"
+            end        
         end    
-    end
+    rescue => error
+    puts "ERROR:bot.rb:#{error}"
+    end ### Отлавливаем ошибки при работе 'telegram/bot'
 end

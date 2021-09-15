@@ -2,30 +2,15 @@ require 'open-uri'
 require 'nokogiri'
 require 'addressable'
 
-config = YAML.load_file("config.yaml")
-$proxy = config["yandex"]["https_proxy"]
-$proxy_addr = config["yandex"]["https_proxy_addr"]
-$proxy_port = config["yandex"]["https_proxy_port"]
-
-if $proxy == 'yes' || $proxy == 'true' || $proxy == 'enable'
-    ENV['https_proxy'] = "http://#{$proxy_addr}:#{$proxy_port}"
-end
-
 def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
     case
         #####################################################################################################################################
         when artist_id_arg && album_id_arg == nil && song_id_arg == nil ### Запрашивается исполнитель #######################################
-            url = URI.parse("https://music.yandex.ru/artist/#{artist_id_arg}") ### Парсим страницу поиска (ищем исполнителя) ################
-            begin ### Отлавливаем ошибки
-                html = URI::open(url)
-                rescue OpenURI::HTTPError => error
-                rescue Errno::ECONNRESET => error
-                puts error
-            end
-            if error
+            url = "https://music.yandex.ru/artist/#{artist_id_arg}" ### Парсим страницу поиска (ищем исполнителя) ################
+            doc = get_html(url)
+            if doc == nil
                 return '@WrongUrl!'
             else    
-                doc = Nokogiri::HTML(html)
                 artist_div = doc.css("div.d-generic-page-head__main-top")
                 if artist_div != nil
                     artist_name = artist_div.to_s[/(?<=class="page-artist__title typo-h1 typo-h1_big">).*(?=\<\/h1>)/]
@@ -39,16 +24,11 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
             end
         #####################################################################################################################################
         when artist_id_arg == nil && album_id_arg && song_id_arg == nil ### Запрашивается альбом ############################################
-            url = URI.parse("https://music.yandex.ru/album/#{album_id_arg}") ### Парсим страницу (ищем название альбома) ####################
-            begin ### Отлавливаем ошибки
-                html = URI::open(url)
-                rescue OpenURI::HTTPError => error
-                rescue Errno::ECONNRESET => error
-                puts error
-            end
-            if error
+            url = "https://music.yandex.ru/album/#{album_id_arg}" ### Парсим страницу (ищем название альбома) ####################
+            doc = get_html(url)
+            if doc == nil
                 return '@WrongUrl!'
-            else doc = Nokogiri::HTML(html)
+            else
                 artist_div = doc.css("div.d-album-summary__content")
                 if artist_div.size != 0
                     album_div = doc.css("div.page-album__title")
@@ -76,32 +56,20 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
         #############################################################################################################################################
         when artist_id_arg == nil && album_id_arg && song_id_arg || artist_id_arg == nil && album_id_arg == nil && song_id_arg ### Запрашивается трек
             if album_id_arg == nil ### Получена короткая ссылка на трек
-                url = URI.parse("https://music.yandex.ru/track/#{song_id_arg}")
-                begin ### Отлавливаем ошибки
-                    html = URI::open(url)
-                    rescue OpenURI::HTTPError => error
-                    rescue Errno::ECONNRESET => error
-                    puts error
-                end
-                if error
+                url = "https://music.yandex.ru/track/#{song_id_arg}"
+                doc = get_html(url)
+                if doc == nil
                     return '@WrongUrl!'
                 else
-                    doc = Nokogiri::HTML(html)
                     artist_div = doc.css("div.page-album__title")
                     album_id_arg = artist_div.to_s[/(?<=<a href="\/album\/).*(?=" class)/] ### Получаем недостающий ID альбома
                 end
             end        
-            url = URI.parse("https://music.yandex.ru/album/#{album_id_arg}/track/#{song_id_arg}") ### Парсим страницу (ищем название трека)
-            begin ### Отлавливаем ошибки
-                html = URI::open(url)
-                rescue OpenURI::HTTPError => error
-                rescue Errno::ECONNRESET => error
-                puts error
-            end
-            if error
+            url = "https://music.yandex.ru/album/#{album_id_arg}/track/#{song_id_arg}" ### Парсим страницу (ищем название трека)
+            doc = get_html(url)
+            if doc == nil
                 return '@WrongUrl!'
             else
-                doc = Nokogiri::HTML(html)
                 artist_div = doc.css("div.d-album-summary__content")
                 album_div = doc.css("div.page-album__title")
                 track_div = doc.css("div.sidebar__title")
@@ -148,13 +116,7 @@ def ya_music_get_id (artist_arg, album_arg, song_arg)
         when artist_arg && album_arg == nil && song_arg == nil ### Запрашивается исполнитель ##########
         ### Парсим страницу поиска (ищем исполнителя) #################################################
             url = Addressable::URI.encode("https://music.yandex.ru/search?text=#{artist_arg}")
-            begin ### Отлавливаем ошибки
-                html = URI::open(url)
-                rescue OpenURI::HTTPError => error
-                rescue Errno::ECONNRESET => error
-                puts error
-            end
-            doc = Nokogiri::HTML(html)
+            doc = get_html(url)
             artists_div = doc.css("div.artist__name")
             if !artists_div.empty?
                 artist_id = artists_div[0].to_s[/(?<=href="\/artist\/).*(?=" class=")/]
@@ -167,26 +129,14 @@ def ya_music_get_id (artist_arg, album_arg, song_arg)
         when artist_arg && album_arg && song_arg == nil ### Запрашивается альбом ######################
         ### Парсим страницу поиска (ищем исполнителя) #################################################
             url = Addressable::URI.encode("https://music.yandex.ru/search?text=#{artist_arg}")
-            begin ### Отлавливаем ошибки
-                html = URI::open(url)
-                rescue OpenURI::HTTPError => error
-                rescue Errno::ECONNRESET => error
-                puts error
-            end
-            doc = Nokogiri::HTML(html)
+            doc = get_html(url)
             artists_div = doc.css("div.artist__name")
             if !artists_div.empty?
                 artist = artists_div[0].attr('title')
                 artist_id = artists_div[0].to_s[/(?<=href="\/artist\/).*(?=" class=")/]
                 ### Парсим страницу исполнителя (ищем альбом)
-                url = URI.parse("https://music.yandex.ru/artist/#{artist_id}/albums")
-                begin ### Отлавливаем ошибки
-                    html = URI::open(url)
-                    rescue OpenURI::HTTPError => error
-                    rescue Errno::ECONNRESET => error
-                    puts error
-                end
-                doc = Nokogiri::HTML(html)
+                url = "https://music.yandex.ru/artist/#{artist_id}/albums"
+                doc = get_html(url)
                 albums_div = doc.css("div.album__title")
                 albums = []
                 albums_div.each do |current_album|
@@ -208,26 +158,14 @@ def ya_music_get_id (artist_arg, album_arg, song_arg)
         when  artist_arg && album_arg && song_arg ### Запрашивается трек ##############################
         ### Парсим страницу поиска (ищем исполнителя) #################################################
             url = Addressable::URI.encode("https://music.yandex.ru/search?text=#{artist_arg}")
-            begin ### Отлавливаем ошибки
-                html = URI::open(url)
-                rescue OpenURI::HTTPError => error
-                rescue Errno::ECONNRESET => error
-                puts error
-            end
-            doc = Nokogiri::HTML(html)
+            doc = get_html(url)
             artists_div = doc.css("div.artist__name")
             if !artists_div.empty?
                 artist = artists_div[0].attr('title')
                 artist_id = artists_div[0].to_s[/(?<=href="\/artist\/).*(?=" class=")/]
                 ### Парсим страницу исполнителя (ищем альбом)
-                url = URI.parse("https://music.yandex.ru/artist/#{artist_id}/albums")
-                begin ### Отлавливаем ошибки
-                    html = URI::open(url)
-                    rescue OpenURI::HTTPError => error
-                    rescue Errno::ECONNRESET => error
-                    puts error
-                end
-                doc = Nokogiri::HTML(html)
+                url = "https://music.yandex.ru/artist/#{artist_id}/albums"
+                doc = get_html(url)
                 albums_div = doc.css("div.album__title")
                 albums = []
                 albums_div.each do |current_album|
@@ -237,14 +175,8 @@ def ya_music_get_id (artist_arg, album_arg, song_arg)
                 if album_number
                     album_id = albums_div[album_number].to_s[/(?<=href="\/album\/).*(?=" class="d-link deco-link album__caption">)/]
                     ### Парсим страницу альбома (ищем трек)
-                    url = URI.parse("https://music.yandex.ru/album/#{album_id}")
-                    begin ### Отлавливаем ошибки
-                        html = URI::open(url)
-                        rescue OpenURI::HTTPError => error
-                        rescue Errno::ECONNRESET => error
-                        puts error
-                    end
-                    doc = Nokogiri::HTML(html)
+                    url = "https://music.yandex.ru/album/#{album_id}"
+                    doc = get_html(url)
                     tracks_div = doc.css("div.d-track__name")
                     tracks = []
                     tracks_div.each do |current_track|

@@ -7,3 +7,5 @@ yandex:
   https_proxy: "no"
   https_proxy_addr: ""
   https_proxy_port: ""
+  https_proxy_user: ""
+  https_proxy_password: ""

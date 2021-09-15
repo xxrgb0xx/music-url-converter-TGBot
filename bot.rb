@@ -4,13 +4,14 @@ require 'rspotify/oauth'
 require 'yaml'
 require_relative 'ya_music.rb'
 require_relative 'spotify.rb'
+require_relative 'url_parser.rb'
 #######################################################################################################################
 config = YAML.load_file("config.yaml")
 tg_token = config["telegram"]["tg_token"]
 #######################################################################################################################
-$stdout.reopen("log/stdout.log", "a")
-$stderr.reopen("log/stderr.log", "a")
-$stdout.sync, $stderr.sync = true
+#$stdout.reopen("log/stdout.log", "a")
+#$stderr.reopen("log/stderr.log", "a")
+#$stdout.sync, $stderr.sync = true
 #######################################################################################################################
 
 Telegram::Bot::Client.run(tg_token) do |bot|
@@ -53,7 +54,9 @@ Telegram::Bot::Client.run(tg_token) do |bot|
                         artist_name = arg[0]
                         album_name = arg [1]
                         ya_music_url = ya_music_get_id(artist_name, album_name, nil)
-                        if ya_music_url == '@NoAlbum!'
+                        if ya_music_url == '@NoArtist!'
+                            bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Яндекс.Музыке нет исполнителя ARTIST##{artist_name}")
+                        elsif ya_music_url == '@NoAlbum!'
                             bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Яндекс.Музыке нет альбома ALBUM##{album_name}")
                         else
                             bot.api.send_message(chat_id: message.chat.id, text: "#{ya_music_url}")

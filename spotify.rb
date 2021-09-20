@@ -63,33 +63,39 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
         when artist_arg && album_arg == nil && song_arg == nil ### Запрашивается исполнитель #######
             begin ### Отлавливаем ошибку.              
                 artists_raw = RSpotify::Artist.search(artist_arg)
-                if artists_raw.size != 0
+                if artists_raw.size != 0 ### Если есть результаты поиска ###########################
                     artists_names = []
                     artists_raw.each do |current_artist|
                         artists_names << current_artist.name.upcase
                     end
                     artist_number = artists_names.index(artist_arg.upcase)
-                    artist_raw = artists_raw[artist_number]       
-                    artist_id = artist_raw.id
-                    url = "https://open.spotify.com/artist/#{artist_id}"
-                    return url
+                    if artist_number == nil ### Если совпадений нет, то берем первый элемент #######
+                        artist_number = 0
+                    end
+                        artist_raw = artists_raw[artist_number]       
+                        artist_id = artist_raw.id
+                        url = "https://open.spotify.com/artist/#{artist_id}"
+                        return url
                 else
                     return '@NoArtist!'
                 end
-                rescue RestClient::BadRequest => error
-                rescue RestClient::NotFound => error
-                puts error   
+            rescue RestClient::BadRequest => error
+            rescue RestClient::NotFound => error
+            puts error   
             end
         #############################################################################################            
         when artist_arg && album_arg && song_arg == nil ### Запрашивается альбом ####################
             begin ### Отлавливаем ошибки
                 artists_raw = RSpotify::Artist.search(artist_arg) ### Ищем запрашиваемого исполнителя
-                if artists_raw.size != 0
+                if artists_raw.size != 0 ### Если есть результаты поиска ############################
                     artists_names = []
                     artists_raw.each do |current_artist|
                         artists_names << current_artist.name.upcase
                     end
                     artist_number = artists_names.index(artist_arg.upcase)
+                    if artist_number == nil ### Если совпадений нет, то берем первый элемент ########
+                        artist_number = 0
+                    end
                     artist_raw = artists_raw[artist_number]
                     artist_name = artist_raw.name
                     artist_id = artist_raw.id
@@ -115,32 +121,31 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
                         url = "https://open.spotify.com/album/#{album_id}"
                         return url
                     else
-                        return '@NoAlbum!'
-                    end                
+                            return '@NoAlbum!'
+                        end                   
                 else
                     return '@NoArtist!'
                 end
-                rescue RestClient::BadRequest => error
-                rescue RestClient::NotFound => error
-                puts error    
+            rescue RestClient::BadRequest => error
+            rescue RestClient::NotFound => error
+            puts error    
             end    
         ############################################################################################            
         when artist_arg && album_arg && song_arg ### Запрашивается трек ############################
             begin ### Ищем запрашиваемого исполнителя
                 artists_raw = RSpotify::Artist.search(artist_arg)
-                artists_names = []
-                artists_raw.each do |current_artist|
-                    artists_names << current_artist.name.upcase
-                end
-                artist_number = artists_names.index(artist_arg.upcase)
-                artist_raw = artists_raw[artist_number]
-                rescue RestClient::BadRequest => error
-                rescue RestClient::NotFound => error
-            end
-            if artist_raw
-                artist_name = artist_raw.name
-                artist_id = artist_raw.id
-                begin ### Ищем альбомы исполнителя
+                if artists_raw.size != 0 ### Если есть результаты поиска ###########################
+                    artists_names = []
+                    artists_raw.each do |current_artist|
+                        artists_names << current_artist.name.upcase
+                    end
+                    artist_number = artists_names.index(artist_arg.upcase)
+                    if artist_number == nil ### Если совпадений нет, то берем первый элемент ########
+                        artist_number = 0
+                    end
+                    artist_raw = artists_raw[artist_number]
+                    artist_name = artist_raw.name
+                    artist_id = artist_raw.id
                     albums_raw = []
                     albums_names = []
                     albums_ids = []                                  
@@ -157,41 +162,35 @@ def spotify_get_id(artist_arg, album_arg, song_arg)
                             albums_ids << current_album.id
                         end
                     end
-                    rescue RestClient::BadRequest => error
-                    rescue RestClient::NotFound => error
-                end
-                album_number = albums_names.index(album_arg.upcase) ### Получаем номер запрашиваемого альбома из массива
-                if album_number ### Если в массиве альбомов есть запрашиваемый
-                    begin ### Получаем id альбома по номеру в массиве
-                        album_id = albums_ids[album_number]
-                        rescue RestClient::BadRequest => error
-                        rescue RestClient::NotFound => error
-                    end   
-                    begin ### Получаем список треков с альбома
-                        album_raw = RSpotify::Album.find(album_id)
+                    album_number = albums_names.index(album_arg.upcase) ### Получаем номер запрашиваемого альбома из массива
+                    if album_number ### Если в массиве альбомов есть запрашиваемый
+                        album_id = albums_ids[album_number] ### Получаем id альбома по номеру в массиве
+                        album_raw = RSpotify::Album.find(album_id) ### Получаем список треков с альбома
                         tracks_raw = album_raw.tracks
-                        rescue RestClient::BadRequest => error
-                        rescue RestClient::NotFound => error
+                        tracks_names = [] ### Создаем массивы с именами и id треков
+                        tracks_ids = [] 
+                        tracks_raw.each do |current_track| 
+                            tracks_names << current_track.name.upcase
+                            tracks_ids << current_track.id
+                        end
+                        track_number = tracks_names.index(song_arg.upcase) ### Получаем номер трека в массиве
+                        if track_number
+                            track_id = tracks_ids[track_number]         
+                            url = "https://open.spotify.com/track/#{track_id}"
+                            return url
+                        else
+                            return '@NoTrack!'
+                        end
+                    else                     
+                        return '@NoAlbum!'
                     end
-                    tracks_names = [] ### Создаем массивы с именами и id треков
-                    tracks_ids = [] 
-                    tracks_raw.each do |current_track| 
-                        tracks_names << current_track.name.upcase
-                        tracks_ids << current_track.id
-                    end
-                    track_number = tracks_names.index(song_arg.upcase) ### Получаем номер трека в массиве
-                    if track_number
-                        track_id = tracks_ids[track_number]           
-                        url = "https://open.spotify.com/track/#{track_id}"
-                        return url
-                    else
-                        return '@NoTrack!'
-                    end
-                else                     
-                    return '@NoAlbum!'
+                else
+                    return '@NoArtist!'
                 end
-            else
-                return '@NoArtist!'
+            rescue RestClient::BadRequest => error
+            rescue RestClient::NotFound => error
+            puts error
             end
+
     end    
 end

@@ -9,9 +9,7 @@ require_relative 'url_parser.rb'
 config = YAML.load_file("config.yaml")
 tg_token = config["telegram"]["tg_token"]
 #######################################################################################################################
-#$stdout.reopen("log/stdout.log", "a")
-#$stderr.reopen("log/stderr.log", "a")
-#$stdout.sync, $stderr.sync = true
+$stdout.sync, $stderr.sync = true
 #######################################################################################################################
 
 Telegram::Bot::Client.run(tg_token) do |bot|

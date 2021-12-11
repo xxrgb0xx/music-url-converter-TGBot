@@ -74,6 +74,8 @@ Telegram::Bot::Client.run(tg_token) do |bot|
                         ya_music_url = ya_music_get_id(artist_name, album_name, track_name)
                         if ya_music_url == '@NoTrack!'
                             bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Яндекс.Музыке нет трека TRACK##{track_name}")
+                        elsif ya_music_url == '@NoAlbum!'
+                            bot.api.send_message(chat_id: message.chat.id, text: "У меня не получилось :(\nНа Яндекс.Музыке нет альбома ALBUM##{album_name}")
                         else
                             bot.api.send_message(chat_id: message.chat.id, text: "#{ya_music_url}")
                         end

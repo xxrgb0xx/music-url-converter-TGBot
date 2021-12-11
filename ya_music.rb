@@ -76,6 +76,9 @@ def ya_music_get_name (artist_id_arg, album_id_arg, song_id_arg)
                 if artist_div.size != 0 && album_div.size != 0 && track_div.size != 0
                     artist_name = artist_div.to_s[/(?<=title=").*?(?=">)/]
                     album_name = album_div.to_s[/(?<=deco-link">).*(?=<\/a>)/]
+                    if album_name == nil
+                        album_name = album_div.to_s[/(?<=deco-typo">).*(?=<\/h1>)/]
+                    end
                     album_version = album_div.to_s[/(?<=album__version link">).*(?=<\/span>)/]
                     album_version2 = album_div.to_s[/(?<=album__version">).*(?=<\/span>)/]
                     track_name = track_div.to_s[/(?<=class="d-link deco-link">).*(?=\<\/a>)/]
